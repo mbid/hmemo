@@ -1,0 +1,52 @@
+module Main where
+
+import Options.Applicative
+import Data.Semigroup
+import qualified Data.Text as T
+import qualified Data.Text.IO as T
+import Types
+import Review
+import Database
+import System.IO
+import System.IO.Error
+import Data.Time
+import Control.Monad.Catch
+import Control.Applicative
+import Prompt
+
+type Config = [FilePath]
+
+config :: Parser Config
+config = some (argument str (metavar "FILES..."))
+
+options :: ParserInfo Config
+options =
+  info (helper <*> config) $ mconcat
+  [ fullDesc
+  , progDesc "The description"
+  , header "The header" ]
+
+iterateUntilNothingM :: Monad m => (a -> m (Maybe a)) -> a -> m [a]
+iterateUntilNothingM f x = do
+  x' <- f x
+  case x' of
+    Nothing -> return [x]
+    (Just x'') -> (x :) <$> iterateUntilNothingM f x''
+
+main :: IO ()
+main = do
+  db <- execParser options >>= readDatabase
+
+  hSetBuffering stdout NoBuffering
+  hSetBuffering stdin (BlockBuffering Nothing)
+
+  reviewedEntries <- reviewUntilEof db
+  mapM_ (putStrLn . show) reviewedEntries
+  let
+    weakCards :: [Card]
+    weakCards =
+      map card $
+      filter ((< 4) . head . responseQualities . stats) $
+      reviewedEntries
+
+  reviewUntil4 weakCards

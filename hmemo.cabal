@@ -1,0 +1,69 @@
+name:                hmemo
+version:             0.1.0.0
+-- synopsis:
+-- description:
+--homepage:            https://github.com/mbid/hmemo#readme
+license:             BSD3
+license-file:        LICENSE
+author:              Martin Bidlingmaier
+maintainer:          martin.bidlingmaier@gmail.com
+copyright:           2017 Martin Bidlingmaier
+category:            CLI
+build-type:          Simple
+extra-source-files:  README.md
+cabal-version:       >=1.10
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     SuperMemo2
+                     , Types
+                     , Serialize
+                     , Database
+                     , Review
+                     , Prompt
+  build-depends:       base >= 4.7 && < 5
+                     , time
+                     , text
+                     , exceptions
+                     , transformers
+                     , monad-loops
+  default-language:    Haskell2010
+  default-extensions:  OverloadedStrings
+                     , TupleSections
+
+executable hmemo-exe
+  hs-source-dirs:      app
+  main-is:             Main.hs
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       base
+                     , hmemo
+                     , optparse-applicative
+                     , text
+                     , time
+                     , exceptions
+  default-language:    Haskell2010
+  default-extensions:  OverloadedStrings
+                     , TupleSections
+
+test-suite hmemo-test
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Spec.hs
+  other-modules:       SerializeSpec
+                     , SuperMemo2Spec
+                     , ReviewSpec
+                     , Util
+  build-depends:       base
+                     , hmemo
+                     , hspec
+                     , text
+                     , QuickCheck
+                     , quickcheck-instances
+                     , time
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  default-language:    Haskell2010
+  default-extensions:  OverloadedStrings
+
+source-repository head
+  type:     git
+  location: https://github.com/mbid/hmemo
