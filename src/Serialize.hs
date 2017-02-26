@@ -10,6 +10,7 @@ import Data.Time.Clock
 import Data.Maybe
 import Data.Char
 import Control.Monad
+import Data.Monoid
 
 data DeserializeException = WrongColumnNumber
                           | InvalidDateString
@@ -64,7 +65,7 @@ parseEntries :: MonadThrow m => T.Text -> m [(Card, CardStats)]
 parseEntries = mapM parseEntry . T.lines
 
 formatEntries :: [(Card, CardStats)] -> T.Text
-formatEntries = T.intercalate "\n" . map formatEntry
+formatEntries = map ((<> "\n") . formatEntry)
 
 readEntries :: FilePath -> IO [(Card, CardStats)]
 readEntries = T.readFile >=> parseEntries
