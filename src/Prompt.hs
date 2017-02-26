@@ -20,6 +20,7 @@ firstColumn = [ "Front: "
               , "Back: "
               , "Yes! "
               , "No. "
+              , "Repeat:  "
               , "Rating: " ]
 
 justifyFirstColumn :: T.Text -> T.Text
@@ -46,7 +47,10 @@ testCard card = do
       T.putStrLn $ inGreen $ justifyFirstColumn "Yes! " <> back card
       return True
     else do
-      T.putStrLn $ inRed $ justifyFirstColumn "No. " <> back card
+      (return ()) `untilM_` do
+        T.putStrLn $ inRed $ justifyFirstColumn "No. " <> back card
+        response <- prompt "Repeat: "
+        return $ response == back card
       return False
 
 parseQuality' :: T.Text -> Maybe Int
@@ -56,15 +60,17 @@ parseQuality' q = case T.unpack q of
 
 evaluate :: IO Int
 evaluate = do
-  T.putStr "Rating: "
-  q <- T.getLine
+  q <- prompt "Rating: "
   fromMaybe evaluate (return <$> parseQuality' q)
+
+clear :: IO ()
+clear = T.putStr "\x1b[2J\x1b[H"
 
 review :: Card -> IO Int
 review c = do
   testCard c
-  q <-  evaluate
-  putStrLn ""
+  q <- evaluate
+  clear
   return q
 
 reviewUntil4 :: [Card] -> IO ()
