@@ -46,8 +46,8 @@ parseEntry :: MonadThrow m => T.Text -> m (Card, CardStats)
 parseEntry l = do
   let components = map T.strip $ T.splitOn "\t" l
   case components of
-    [back, front] -> return (Card { back = back, front = front}, CardStats Nothing [])
-    [back, front, lr, qs] -> do
+    [front, back] -> return (Card { back = back, front = front}, CardStats Nothing [])
+    [front, back, lr, qs] -> do
       lr' <- fromMaybe (throwM InvalidDateString) $ return <$> parseTime' lr
       qs' <- parseQualities qs
       return (Card { back = back, front = front}, CardStats (Just lr') qs')
@@ -55,7 +55,7 @@ parseEntry l = do
 
 formatEntry :: (Card, CardStats) -> T.Text
 formatEntry (c, cs) = T.intercalate "\t" $
-  [back c, front c]
+  [front c, back c]
   ++
   case lastReview cs of
     Just lr -> [formatTime' lr, formatQualities $ responseQualities cs]
@@ -65,7 +65,7 @@ parseEntries :: MonadThrow m => T.Text -> m [(Card, CardStats)]
 parseEntries = mapM parseEntry . T.lines
 
 formatEntries :: [(Card, CardStats)] -> T.Text
-formatEntries = map ((<> "\n") . formatEntry)
+formatEntries = T.concat . map ((<> "\n") . formatEntry)
 
 readEntries :: FilePath -> IO [(Card, CardStats)]
 readEntries = T.readFile >=> parseEntries
