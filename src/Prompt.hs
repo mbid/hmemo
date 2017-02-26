@@ -20,7 +20,7 @@ firstColumn = [ "Front: "
               , "Back: "
               , "Yes! "
               , "No. "
-              , "Repeat:  "
+              , "Repeat: "
               , "Rating: " ]
 
 justifyFirstColumn :: T.Text -> T.Text
