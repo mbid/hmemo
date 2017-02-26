@@ -41,7 +41,6 @@ main = do
   hSetBuffering stdin (BlockBuffering Nothing)
 
   reviewedEntries <- reviewUntilEof db
-  mapM_ (putStrLn . show) reviewedEntries
   let
     weakCards :: [Card]
     weakCards =
