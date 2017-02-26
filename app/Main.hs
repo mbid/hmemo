@@ -26,13 +26,6 @@ options =
   , progDesc "Read vocabulary from FILES and start learning session."
   , header "hmemo - CLI spaced repetition learning" ]
 
-iterateUntilNothingM :: Monad m => (a -> m (Maybe a)) -> a -> m [a]
-iterateUntilNothingM f x = do
-  x' <- f x
-  case x' of
-    Nothing -> return [x]
-    (Just x'') -> (x :) <$> iterateUntilNothingM f x''
-
 main :: IO ()
 main = do
   db <- execParser options >>= readDatabase
