@@ -23,8 +23,8 @@ options :: ParserInfo Config
 options =
   info (helper <*> config) $ mconcat
   [ fullDesc
-  , progDesc "The description"
-  , header "The header" ]
+  , progDesc "Read vocabulary from FILES and start learning session."
+  , header "hmemo - CLI spaced repetition learning" ]
 
 iterateUntilNothingM :: Monad m => (a -> m (Maybe a)) -> a -> m [a]
 iterateUntilNothingM f x = do
