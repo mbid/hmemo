@@ -47,5 +47,7 @@ main = do
       map card $
       filter ((< 4) . head . responseQualities . stats) $
       reviewedEntries
-
+  T.putStrLn "Now reviewing mistakes"
+  T.putStrLn ""
   reviewUntil4 weakCards
+  T.putStrLn $ inGreen "Done!"

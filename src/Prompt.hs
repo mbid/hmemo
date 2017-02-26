@@ -18,9 +18,9 @@ import Control.Exception (assert)
 
 firstColumn = [ "Front: "
               , "Back: "
-              , "Yes!"
-              , "No: "
-              , "Rating (0 to 5): " ]
+              , "Yes! "
+              , "No. "
+              , "Rating: " ]
 
 justifyFirstColumn :: T.Text -> T.Text
 justifyFirstColumn t =
@@ -43,10 +43,10 @@ testCard card = do
   response <- prompt "Back: "
   if response == back card
     then do
-      T.putStrLn $ justifyFirstColumn $ inGreen "Yes!"
+      T.putStrLn $ inGreen $ justifyFirstColumn "Yes! " <> back card
       return True
     else do
-      T.putStrLn $ inRed $ justifyFirstColumn "No: " <> back card
+      T.putStrLn $ inRed $ justifyFirstColumn "No. " <> back card
       return False
 
 parseQuality' :: T.Text -> Maybe Int
@@ -56,12 +56,16 @@ parseQuality' q = case T.unpack q of
 
 evaluate :: IO Int
 evaluate = do
-  T.putStr "Rating (0 to 5): "
+  T.putStr "Rating: "
   q <- T.getLine
   fromMaybe evaluate (return <$> parseQuality' q)
 
 review :: Card -> IO Int
-review c = testCard c >> evaluate
+review c = do
+  testCard c
+  q <-  evaluate
+  putStrLn ""
+  return q
 
 reviewUntil4 :: [Card] -> IO ()
 reviewUntil4 [] = return ()
@@ -88,5 +92,5 @@ reviewSaveAndUpdate db = runMaybeT $ do
 reviewUntilEof :: Database -> IO [Entry]
 reviewUntilEof =
   unfoldrM 
-  (handleIf isEOFError (const $ putStrLn "" >> return Nothing) .
+  (handleIf isEOFError (const $ putStr "\n\n" >> return Nothing) .
   reviewSaveAndUpdate)
