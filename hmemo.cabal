@@ -2,7 +2,7 @@ name:                hmemo
 version:             0.1.0.0
 -- synopsis:
 -- description:
---homepage:            https://github.com/mbid/hmemo#readme
+homepage:            https://github.com/mbid/hmemo#readme
 license:             BSD3
 license-file:        LICENSE
 author:              Martin Bidlingmaier
