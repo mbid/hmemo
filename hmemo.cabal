@@ -31,7 +31,7 @@ library
   default-extensions:  OverloadedStrings
                      , TupleSections
 
-executable hmemo-exe
+executable hmemo
   hs-source-dirs:      app
   main-is:             Main.hs
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
