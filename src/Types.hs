@@ -8,6 +8,7 @@ data Card = Card { front :: T.Text
   deriving (Show, Eq)
 
 data History = History { lastReview :: Maybe UTCTime
+                       -- the historical response qualities, oldest last
                        , qualities :: [Int] }
   deriving (Show, Eq)
 

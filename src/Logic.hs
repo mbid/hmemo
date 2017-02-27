@@ -6,6 +6,8 @@ import Types
 import Database
 import Data.Time
 import Data.Maybe
+import qualified Data.Map.Lazy as M
+import Data.Monoid
 
 nextReview :: History -> Maybe UTCTime
 nextReview cs = do
@@ -25,3 +27,14 @@ needsLearning now cs = fromMaybe True $ (now `approxNotBefore`) <$> nextReview c
 
 learnables :: UTCTime -> Database -> [DCH]
 learnables now = filter (needsLearning now . history . snd) . flattenDatabase
+
+qualityHistogram :: Database -> M.Map (Maybe Int) Int
+qualityHistogram db =
+  M.fromList $
+  map (\q -> (q, count q)) $
+  map Just [0 .. 5] <> [Nothing]
+  where
+    qs :: [Maybe Int]
+    qs = map (listToMaybe . qualities. history . ch) $ flattenDatabase db
+    count :: Maybe Int -> Int
+    count q = length $ filter (== q) qs

@@ -27,6 +27,7 @@ library
                      , exceptions
                      , transformers
                      , monad-loops
+                     , containers
   default-language:    Haskell2010
   default-extensions:  OverloadedStrings
                      , TupleSections
@@ -41,6 +42,7 @@ executable hmemo
                      , text
                      , time
                      , exceptions
+                     , containers
   default-language:    Haskell2010
   default-extensions:  OverloadedStrings
                      , TupleSections
