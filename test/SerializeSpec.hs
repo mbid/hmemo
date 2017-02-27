@@ -18,7 +18,7 @@ spec = do
       property $
         \(CsvValue back) (CsvValue front) -> 
         parseEntry (front <> "\t" <> back) ===
-        Just (Card {back = back, front = front}, CardStats Nothing [])
+        Just (Card {back = back, front = front}, History Nothing [])
     it "should parse entries with data and qualities" $ do
       let e = parseEntry "front\tback \t2301-11-03T11:33:22\t 120453"
       e `shouldSatisfy` isJust
@@ -26,7 +26,7 @@ spec = do
       back card `shouldBe` "back"
       front card `shouldBe` "front"
       lastReview stats `shouldSatisfy` isJust
-      responseQualities stats `shouldBe` [3, 5, 4, 0, 2, 1]
+      qualities stats `shouldBe` [3, 5, 4, 0, 2, 1]
     it "shouldn't parse entries with too many or too few columns" $ do
       forAll
         (arbitrary `suchThat` \ts -> length ts /= 2)

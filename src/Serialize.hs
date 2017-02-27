@@ -42,33 +42,33 @@ parseQualities = fmap reverse . mapM parseQuality . T.unpack
 formatQualities :: [Int] -> T.Text
 formatQualities = T.pack . reverse . map formatQuality
 
-parseEntry :: MonadThrow m => T.Text -> m (Card, CardStats)
+parseEntry :: MonadThrow m => T.Text -> m CH
 parseEntry l = do
   let components = map T.strip $ T.splitOn "\t" l
   case components of
-    [front, back] -> return (Card { back = back, front = front}, CardStats Nothing [])
+    [front, back] -> return (Card { back = back, front = front}, History Nothing [])
     [front, back, lr, qs] -> do
       lr' <- fromMaybe (throwM InvalidDateString) $ return <$> parseTime' lr
       qs' <- parseQualities qs
-      return (Card { back = back, front = front}, CardStats (Just lr') qs')
+      return (Card { back = back, front = front}, History (Just lr') qs')
     _ -> throwM WrongColumnNumber
 
-formatEntry :: (Card, CardStats) -> T.Text
+formatEntry :: CH -> T.Text
 formatEntry (c, cs) = T.intercalate "\t" $
   [front c, back c]
   ++
   case lastReview cs of
-    Just lr -> [formatTime' lr, formatQualities $ responseQualities cs]
+    Just lr -> [formatTime' lr, formatQualities $ qualities cs]
     Nothing -> []
 
-parseEntries :: MonadThrow m => T.Text -> m [(Card, CardStats)]
+parseEntries :: MonadThrow m => T.Text -> m [CH]
 parseEntries = mapM parseEntry . T.lines
 
-formatEntries :: [(Card, CardStats)] -> T.Text
+formatEntries :: [CH] -> T.Text
 formatEntries = T.concat . map ((<> "\n") . formatEntry)
 
-readEntries :: FilePath -> IO [(Card, CardStats)]
+readEntries :: FilePath -> IO [CH]
 readEntries = T.readFile >=> parseEntries
 
-writeEntries :: FilePath -> [(Card, CardStats)] -> IO ()
+writeEntries :: FilePath -> [CH] -> IO ()
 writeEntries fp = T.writeFile fp . formatEntries

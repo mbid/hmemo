@@ -32,10 +32,10 @@ floorSecond t = t {utctDayTime = secondsToDiffTime $ picos `div` (10 ^ 12)}
   where
     picos = diffTimeToPicoseconds $ utctDayTime t
 
-instance Arbitrary CardStats where
+instance Arbitrary History where
   arbitrary = do
     lr <- fmap floorSecond <$> arbitrary
     qs <- case lr of
       Nothing -> return []
       (Just _) -> listOf1 (elements [0 .. 5])
-    return $ CardStats lr qs
+    return $ History lr qs

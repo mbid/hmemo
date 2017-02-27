@@ -7,12 +7,19 @@ data Card = Card { front :: T.Text
                  , back :: T.Text }
   deriving (Show, Eq)
 
-data CardStats = CardStats { lastReview :: Maybe UTCTime
-                           , responseQualities :: [Int] }
+data History = History { lastReview :: Maybe UTCTime
+                       , qualities :: [Int] }
   deriving (Show, Eq)
 
-type Entry = (Card, CardStats)
-card :: Entry -> Card
+type CH = (Card, History)
+card :: CH -> Card
 card = fst
-stats :: Entry -> CardStats
-stats = snd
+history :: CH -> History
+history = snd
+
+type Deck = FilePath
+type DCH = (Deck, CH)
+deck :: DCH -> Deck
+deck = fst
+ch :: DCH -> CH
+ch = snd

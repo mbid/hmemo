@@ -2,7 +2,7 @@ module Prompt where
 
 import Types
 import Database
-import Review
+import Logic
 import Serialize
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
@@ -68,9 +68,9 @@ clear = T.putStr "\x1b[2J\x1b[H"
 
 review :: Card -> IO Int
 review c = do
+  clear
   testCard c
   q <- evaluate
-  clear
   return q
 
 reviewUntil4 :: [Card] -> IO ()
@@ -79,23 +79,23 @@ reviewUntil4 cs = do
   qs <- mapM review cs
   reviewUntil4 $ map snd $ filter ((< 4) . fst) $ zip qs cs
 
-updateStats :: UTCTime -> Int -> CardStats -> CardStats
-updateStats t q cs = CardStats { lastReview = (Just t)
-                               , responseQualities = q : responseQualities cs }
+updateStats :: UTCTime -> Int -> History -> History
+updateStats t q cs = History { lastReview = (Just t)
+                             , qualities = q : qualities cs }
 
-reviewSaveAndUpdate :: Database -> IO (Maybe (Entry, Database))
+reviewSaveAndUpdate :: Database -> IO (Maybe (CH, Database))
 reviewSaveAndUpdate db = runMaybeT $ do
   t <- lift $ getCurrentTime
-  (fp, (c, cs)) <- MaybeT $ return $ listToMaybe $ reviewables t db
+  (d, (c, cs)) <- MaybeT $ return $ listToMaybe $ learnables t db
   q <- lift $ review c
   t <- lift $ getCurrentTime
   let 
     cs' = updateStats t q cs
-    db' = setStats fp c cs' db
-  lift $ savePart fp db'
+    db' = setStats d c cs' db
+  lift $ saveDeck d db'
   return ((c, cs'), db')
 
-reviewUntilEof :: Database -> IO [Entry]
+reviewUntilEof :: Database -> IO [CH]
 reviewUntilEof =
   unfoldrM 
   (handleIf isEOFError (const $ putStr "\n\n" >> return Nothing) .

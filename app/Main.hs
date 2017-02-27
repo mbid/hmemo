@@ -5,7 +5,7 @@ import Data.Semigroup
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Types
-import Review
+import Logic
 import Database
 import System.IO
 import System.IO.Error
@@ -13,8 +13,9 @@ import Data.Time
 import Control.Monad.Catch
 import Control.Applicative
 import Prompt
+import Control.Monad
 
-type Config = [FilePath]
+type Config = [Deck]
 
 config :: Parser Config
 config = some (argument str (metavar "FILES..."))
@@ -34,13 +35,21 @@ main = do
   hSetBuffering stdin (BlockBuffering Nothing)
 
   reviewedEntries <- reviewUntilEof db
+  clear
+
   let
     weakCards :: [Card]
     weakCards =
       map card $
-      filter ((< 4) . head . responseQualities . stats) $
+      filter ((< 4) . head . qualities . history) $
       reviewedEntries
-  T.putStrLn "Now reviewing mistakes"
-  T.putStrLn ""
-  reviewUntil4 weakCards
+  when (not $ null weakCards) $ do
+    T.putStrLn $ 
+         "Now reviewing "
+      <> (T.pack $ show $ length weakCards)
+      <> (if (length weakCards == 1) then " mistake" else " mistakes")
+    T.putStrLn "Press enter to continue"
+    T.getLine
+    reviewUntil4 weakCards
+    clear
   T.putStrLn $ inGreen "Done!"
