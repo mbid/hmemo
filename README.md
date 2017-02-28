@@ -5,7 +5,7 @@ Spaced repetition of flash cards on the command line, using simple csv-like file
 ## Usage
 
 Create a tsv file (csv, but with tabs instead of commas) containing your flash cards.
-The first column should be the front of the cards, i.e. the question, and the back should be the answer.
+The first column should be the front of the cards, i.e. the question, and the second column should be the the answer.
 ```
 > cat german.tsv
 correct richtig
