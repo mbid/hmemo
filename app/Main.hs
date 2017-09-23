@@ -1,7 +1,7 @@
 module Main where
 
 import Options.Applicative
-import Data.Semigroup
+import Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Types
